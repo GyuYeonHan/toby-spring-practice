@@ -13,5 +13,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="jar" level="project" />
+    <orderEntry type="library" name="spring-dao-2.0.8" level="project" />
+    <orderEntry type="library" name="org.springframework.test-3.0.7.RELEASE" level="project" />
   </component>
 </module>
