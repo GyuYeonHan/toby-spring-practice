@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 import user.dao.UserDao;
 import user.domain.Level;
 import user.domain.User;
@@ -26,7 +27,7 @@ import static user.service.NormalUserLevelUpgradePolicy.MIN_RECOMMEND_FOR_GOLD;
 public class UserServiceTest {
     @Autowired UserService userService;
     @Autowired UserDao userDao;
-    @Autowired DataSource dataSource;
+    @Autowired PlatformTransactionManager transactionManager;
     List<User> users;
 
     static class TestUserService extends UserService {
@@ -99,7 +100,7 @@ public class UserServiceTest {
     public void upgradeAllOrNothing() throws Exception {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setDataSource(this.dataSource);
+        testUserService.setTransactionManager(transactionManager);
 
         userDao.deleteAll();
         for (User user : users) userDao.add(user);
@@ -110,9 +111,7 @@ public class UserServiceTest {
         } catch (TestUserServiceException e) {
 
         }
-
         checkLevelUpgraded(users.get(1), false);
-
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {
