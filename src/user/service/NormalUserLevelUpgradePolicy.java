@@ -19,7 +19,7 @@ public class NormalUserLevelUpgradePolicy implements UserLevelUpgradePolicy {
             case BASIC: return (user.getLogin() >= MIN_LOGCOUNT_FOR_SILVER);
             case SILVER: return (user.getRecommend() >= MIN_RECOMMEND_FOR_GOLD);
             case GOLD: return false;
-            default: throw new IllegalArgumentException("Unknown Level: ");
+            default: throw new IllegalArgumentException("Unknown Level: " + currentLevel);
         }
     }
 

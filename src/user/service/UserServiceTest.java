@@ -10,9 +10,11 @@ import user.dao.UserDao;
 import user.domain.Level;
 import user.domain.User;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,7 +26,25 @@ import static user.service.NormalUserLevelUpgradePolicy.MIN_RECOMMEND_FOR_GOLD;
 public class UserServiceTest {
     @Autowired UserService userService;
     @Autowired UserDao userDao;
+    @Autowired DataSource dataSource;
     List<User> users;
+
+    static class TestUserService extends UserService {
+        private String id;
+
+        public TestUserService(String id) {
+            this.id = id;
+        }
+
+        @Override
+        protected void upgradeLevel(User user) {
+            if (user.getId().equals(this.id)) throw new TestUserServiceException();
+            super.upgradeLevel(user);
+        }
+    }
+
+    static public class TestUserServiceException extends RuntimeException {
+    }
 
     @Before
     public void setUp() {
@@ -43,7 +63,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels() {
+    public void upgradeLevels() throws Exception {
         userDao.deleteAll();
         for (User user : users) userDao.add(user);
 
@@ -72,6 +92,26 @@ public class UserServiceTest {
 
         assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
         assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+
+    }
+
+    @Test
+    public void upgradeAllOrNothing() throws Exception {
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        testUserService.setDataSource(this.dataSource);
+
+        userDao.deleteAll();
+        for (User user : users) userDao.add(user);
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException expected");
+        } catch (TestUserServiceException e) {
+
+        }
+
+        checkLevelUpgraded(users.get(1), false);
 
     }
 
