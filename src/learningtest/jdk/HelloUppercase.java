@@ -2,10 +2,10 @@ package learningtest.jdk;
 
 import java.util.Locale;
 
-public class HelloUppercase implements Hello {
-    Hello hello;
+public class HelloUppercase implements ProxyTest.Hello {
+    ProxyTest.Hello hello;
 
-    public HelloUppercase(Hello hello) {
+    public HelloUppercase(ProxyTest.Hello hello) {
         this.hello = hello;
     }
 
